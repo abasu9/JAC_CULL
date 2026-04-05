@@ -1,4 +1,4 @@
-sv import from ..services.retention_service { get_mock_employees, run_retention_evaluation }
+import from ..services.retention_service { get_mock_employees, run_retention_evaluation }
 
 def:pub useRetentionDashboard() -> dict {
     has employees: list = [];
