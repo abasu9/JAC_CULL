@@ -43,3 +43,5 @@ INFO - LLM telemetry endpoints registered: /admin/llm/telemetry/{summary,traces,
 ✔ Recompiled: ./components/retentionDashboard.cl.jac -> retentionDashboard.js
 [HMR] Reloaded: ./hooks/useRetentionDashboard.cl.jac
 ✔ Recompiled: ./hooks/useRetentionDashboard.cl.jac -> useRetentionDashboard.js
+[HMR] Reloaded: ./hooks/useRetentionDashboard.cl.jac
+✔ Recompiled: ./hooks/useRetentionDashboard.cl.jac -> useRetentionDashboard.js

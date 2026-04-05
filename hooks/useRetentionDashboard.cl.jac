@@ -1,5 +1,4 @@
 sv import from ..services.retention_service { get_mock_employees, run_retention_evaluation }
-sv import from ..services.retention_service { get_mock_employees, run_retention_evaluation }
 import from "@jac/runtime" { jacIsLoggedIn }
 
 def:pub useRetentionDashboard() -> dict {
