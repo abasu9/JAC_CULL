@@ -1,7 +1,7 @@
 [project]
-name = "jactastic"
+name = "hr_insights_copilot"
 version = "1.0.0"
-description = "Jac client application: jactastic"
+description = "Hackathon-ready agentic HR insights copilot built with Jac, Jac Builder, and Jaseci"
 entry-point = "main.jac"
 
 [dependencies]
@@ -13,8 +13,6 @@ tailwindcss = "^4.1.17"
 [dependencies.npm.dev]
 "@jac-client/dev-deps" = "2.0.0"
 
-
-
 [dev-dependencies]
 watchdog = ">=3.0.0"
 
@@ -24,11 +22,9 @@ watchdog = ">=3.0.0"
 plugins = ["tailwindcss()"]
 lib_imports = ["import tailwindcss from '@tailwindcss/vite'"]
 
-
-
 [serve]
 base_route_app = "app"
 
 [jacpack]
-name = 'Build_a_Level_2_hackathon-ready_agentic'
-description = 'Jac IDE snapshot for Build_a_Level_2_hackathon-ready_agentic'
+name = 'hr_insights_copilot'
+description = 'Jac IDE snapshot for HR Insights Copilot'
