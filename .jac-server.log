@@ -45,3 +45,4 @@ INFO - LLM telemetry endpoints registered: /admin/llm/telemetry/{summary,traces,
 [HMR] Reloaded: ./hr_agent.jac
 [HMR] Reloaded: ./chat_entry.jac
 [HMR] Reloaded: ./hr_agent.jac
+[HMR] Reloaded: ./chat_entry.jac
