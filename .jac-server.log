@@ -41,3 +41,4 @@ INFO - LLM telemetry endpoints registered: /admin/llm/telemetry/{summary,traces,
 [HMR] Reloaded: ./employee_summary.jac
 [HMR] Reloaded: ./employee_summary.jac
 [HMR] Reloaded: ./top_contributors.jac
+[HMR] Reloaded: ./data_gap_check.jac
