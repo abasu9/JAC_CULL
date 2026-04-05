@@ -1,4 +1,6 @@
-import from ..services.retention_service { get_mock_employees, run_retention_evaluation }
+sv import from ..services.retention_service { get_mock_employees, run_retention_evaluation }
+sv import from ..services.retention_service { get_mock_employees, run_retention_evaluation }
+import from "@jac/runtime" { jacIsLoggedIn }
 
 def:pub useRetentionDashboard() -> dict {
     has employees: list = [];
@@ -7,8 +9,14 @@ def:pub useRetentionDashboard() -> dict {
     has running: bool = False;
     has result: dict = {};
     has error: str = "";
+    has is_logged_in: bool = False;
 
     async can with entry {
+        is_logged_in = jacIsLoggedIn();
+        if not is_logged_in {
+            loading = False;
+            return;
+        }
         try {
             employees = await get_mock_employees() or [];
             if len(employees) > 0 and employees[0] and "employee_id" in employees[0] {
@@ -26,7 +34,7 @@ def:pub useRetentionDashboard() -> dict {
     }
 
     async def runEvaluation() -> None {
-        if not selected_employee_id {
+        if not jacIsLoggedIn() or not selected_employee_id {
             return;
         }
         running = True;
@@ -47,6 +55,7 @@ def:pub useRetentionDashboard() -> dict {
         "running": running,
         "result": result,
         "error": error,
+        "is_logged_in": is_logged_in,
         "runEvaluation": runEvaluation
     };
 }
