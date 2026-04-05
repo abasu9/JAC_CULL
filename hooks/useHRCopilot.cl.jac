@@ -11,7 +11,7 @@ def:pub useHRCopilot() -> dict {
         await runQuery(query);
     }
 
-    def setQuery(value: str) -> None {
+    def updateQuery(value: str) -> None {
         query = value;
     }
 
@@ -32,7 +32,7 @@ def:pub useHRCopilot() -> dict {
 
     return {
         "query": query,
-        "setQuery": setQuery,
+        "setQuery": updateQuery,
         "loading": loading,
         "result": result,
         "history": history,
