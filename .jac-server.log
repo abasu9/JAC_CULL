@@ -37,3 +37,4 @@ INFO - LLM telemetry endpoints registered: /admin/llm/telemetry/{summary,traces,
 ✔ Recompiled: ./main.jac -> main.js
 [HMR] Reloaded: ./hr_graph.jac
 [HMR] Reloaded: ./data_loader.jac
+[HMR] Reloaded: ./query_router.jac
