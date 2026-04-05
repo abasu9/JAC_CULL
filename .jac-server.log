@@ -29,3 +29,6 @@ INFO - LLM telemetry endpoints registered: /admin/llm/telemetry/{summary,traces,
    Monitoring: **/*.jac (18 files)
 
 ✔ Recompiled: ./hooks/useRetentionDashboard.cl.jac -> useRetentionDashboard.js
+[HMR] Reloaded: ./services/retention_service.sv.jac
+[HMR] Reloaded: ./main.jac
+✔ Recompiled: ./main.jac -> main.js

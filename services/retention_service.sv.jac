@@ -1,4 +1,9 @@
-node EmployeeProfile {
+import from os { getenv }
+import from urllib.request { Request, urlopen }
+import from urllib.parse { quote }
+import from json { loads }
+
+obj EmployeeProfile {
     has employee_id: str = "";
     has name: str = "";
     has role_family: str = "";
@@ -170,6 +175,107 @@ def build_chain(evidence: list, interpretation: str, conclusion: str) -> dict {
         "evidence": evidence,
         "interpretation": interpretation,
         "conclusion": conclusion
+    };
+}
+
+def github_headers() -> dict {
+    token = getenv("GITHUB_PAT") or "";
+    if not token {
+        return {};
+    }
+    return {
+        "Authorization": "Bearer " + token,
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "jac-retention-dashboard"
+    };
+}
+
+def github_get_json(url: str) -> any {
+    headers = github_headers();
+    if not headers {
+        return {"error": "GitHub PAT not configured. Set GITHUB_PAT on the backend."};
+    }
+    req = Request(url, headers=headers);
+    response = urlopen(req, timeout=20);
+    return loads(response.read().decode("utf-8"));
+}
+
+def fetch_github_activity(username: str, org: str = "", repo: str = "") -> dict {
+    if not username {
+        return {"status": "error", "message": "GitHub username is required.", "activity": {}};
+    }
+    encoded_user = quote(username);
+    user_data = github_get_json("https://api.github.com/users/" + encoded_user);
+    if user_data and "error" in user_data {
+        return {"status": "error", "message": user_data["error"], "activity": {}};
+    }
+    events = github_get_json("https://api.github.com/users/" + encoded_user + "/events/public?per_page=100");
+    if events and "error" in events {
+        return {"status": "error", "message": events["error"], "activity": {}};
+    }
+    repo_data = {};
+    pulls = [];
+    if org and repo {
+        repo_data = github_get_json("https://api.github.com/repos/" + quote(org) + "/" + quote(repo));
+        pulls = github_get_json("https://api.github.com/repos/" + quote(org) + "/" + quote(repo) + "/pulls?state=all&per_page=100");
+        if repo_data and "error" in repo_data {
+            repo_data = {};
+        }
+        if pulls and "error" in pulls {
+            pulls = [];
+        }
+    }
+    push_count = 0;
+    review_count = 0;
+    pr_event_count = 0;
+    for event in events if events else [] {
+        event_type = event["type"] if event and "type" in event else "";
+        if event_type == "PushEvent" {
+            push_count = push_count + 1;
+        }
+        if event_type == "PullRequestReviewEvent" {
+            review_count = review_count + 1;
+        }
+        if event_type == "PullRequestEvent" {
+            pr_event_count = pr_event_count + 1;
+        }
+    }
+    authored_prs = 0;
+    merged_prs = 0;
+    for pr in pulls if pulls else [] {
+        if pr and "user" in pr and pr["user"] and "login" in pr["user"] and pr["user"]["login"].lower() == username.lower() {
+            authored_prs = authored_prs + 1;
+            if "merged_at" in pr and pr["merged_at"] {
+                merged_prs = merged_prs + 1;
+            }
+        }
+    }
+    activity = {
+        "username": username,
+        "org": org,
+        "repo": repo,
+        "public_repos": user_data["public_repos"] if "public_repos" in user_data else 0,
+        "followers": user_data["followers"] if "followers" in user_data else 0,
+        "recent_push_events": push_count,
+        "recent_pr_events": pr_event_count,
+        "recent_review_events": review_count,
+        "authored_prs": authored_prs,
+        "merged_prs": merged_prs,
+        "repo_open_issues": repo_data["open_issues_count"] if repo_data and "open_issues_count" in repo_data else 0,
+        "repo_stars": repo_data["stargazers_count"] if repo_data and "stargazers_count" in repo_data else 0
+    };
+    return {
+        "status": "ok",
+        "message": "GitHub activity fetched successfully.",
+        "activity": activity,
+        "evidence": [
+            "Recent push events: " + str(push_count),
+            "Recent PR events: " + str(pr_event_count),
+            "Recent review events: " + str(review_count),
+            "Authored PRs in scoped repo: " + str(authored_prs),
+            "Merged PRs in scoped repo: " + str(merged_prs)
+        ]
     };
 }
 
@@ -371,6 +477,18 @@ def:pub get_mock_employees() -> list {
         }
         for employee in mock_employees()
     ];
+}
+
+def:pub get_github_pat_status() -> dict {
+    token = getenv("GITHUB_PAT") or "";
+    return {
+        "configured": bool(token),
+        "message": "GitHub PAT is configured on the backend." if token else "GitHub PAT not configured. Set GITHUB_PAT on the backend."
+    };
+}
+
+def:pub get_github_activity(username: str, org: str = "", repo: str = "") -> dict {
+    return fetch_github_activity(username, org, repo);
 }
 
 def:pub run_retention_evaluation(employee_id: str) -> dict {
