@@ -40,3 +40,4 @@ INFO - LLM telemetry endpoints registered: /admin/llm/telemetry/{summary,traces,
 [HMR] Reloaded: ./query_router.jac
 [HMR] Reloaded: ./employee_summary.jac
 [HMR] Reloaded: ./employee_summary.jac
+[HMR] Reloaded: ./top_contributors.jac
