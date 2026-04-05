@@ -33,3 +33,5 @@ INFO - LLM telemetry endpoints registered: /admin/llm/telemetry/{summary,traces,
 👀 Watching for changes...
    Monitoring: **/*.jac (6 files)
 
+[HMR] Reloaded: ./main.jac
+✔ Recompiled: ./main.jac -> main.js
