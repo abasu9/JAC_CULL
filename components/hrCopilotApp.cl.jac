@@ -11,10 +11,10 @@ def:pub HRCopilotApp() -> JsxElement {
         "Run employee performance analysis"
     ];
 
-    result = copilot["result"] if copilot["result"] else {};
+    result = copilot["result"] if copilot and "result" in copilot and copilot["result"] else {};
     mode = result["mode"] if result and "mode" in result else "overview";
     guardrail = result["guardrail"] if result and "guardrail" in result else "This copilot provides neutral HR decision support only.";
-    history = copilot["history"] if copilot["history"] else [];
+    history = copilot["history"] if copilot and "history" in copilot and copilot["history"] else [];
 
     def handle_input(e: any) -> None {
         copilot["setQuery"](e.target.value);
@@ -35,22 +35,24 @@ def:pub HRCopilotApp() -> JsxElement {
     def choose_gap() -> None { selected_query = sample_queries[2]; }
     def choose_team() -> None { selected_query = sample_queries[3]; }
     def choose_analysis() -> None { selected_query = sample_queries[4]; }
-    def rerun_first() -> None { if len(history) > 0 { selected_query = history[0]["query"]; } }
-    def rerun_second() -> None { if len(history) > 1 { selected_query = history[1]["query"]; } }
-    def rerun_third() -> None { if len(history) > 2 { selected_query = history[2]["query"]; } }
-    def rerun_fourth() -> None { if len(history) > 3 { selected_query = history[3]["query"]; } }
-    def rerun_fifth() -> None { if len(history) > 4 { selected_query = history[4]["query"]; } }
+    def rerun_first() -> None { if len(history) > 0 and history[0] { selected_query = history[0]["query"] if "query" in history[0] else ""; } }
+    def rerun_second() -> None { if len(history) > 1 and history[1] { selected_query = history[1]["query"] if "query" in history[1] else ""; } }
+    def rerun_third() -> None { if len(history) > 2 and history[2] { selected_query = history[2]["query"] if "query" in history[2] else ""; } }
+    def rerun_fourth() -> None { if len(history) > 3 and history[3] { selected_query = history[3]["query"] if "query" in history[3] else ""; } }
+    def rerun_fifth() -> None { if len(history) > 4 and history[4] { selected_query = history[4]["query"] if "query" in history[4] else ""; } }
 
     def renderList(items: list, empty_text: str) -> JsxElement {
+        safe_items = items if items else [];
         return
             <div className="flex flex-col gap-3">
-                {len(items) == 0
+                {len(safe_items) == 0
                 and <div className="rounded-2xl border border-dashed border-border bg-background/40 px-4 py-5 text-sm text-muted-foreground">{empty_text}</div>}
                 {[
                     <div key={str(idx)} className="rounded-2xl border border-border bg-background/40 p-4 text-sm text-muted-foreground">
                         <pre className="overflow-x-auto whitespace-pre-wrap font-sans leading-6 text-foreground">{JSON.stringify(item, None, 2)}</pre>
                     </div>
-                    for (idx, item) in enumerate(items)
+                    for (idx, item) in enumerate(safe_items)
+                    if item
                 ]}
             </div>;
     }
