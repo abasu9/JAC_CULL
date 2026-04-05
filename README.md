@@ -1,162 +1,91 @@
-# HR Insights Copilot
+# Employee Retention Decision Support
 
-A hackathon-ready agentic HR insights copilot built with **Jac Builder**, **Jac**, and **Jaseci**.
+A production-oriented employee retention decision-support system built in Jac with a modular fullstack structure.
 
 ## Overview
-HR Insights Copilot helps HR partners and managers consolidate fragmented employee context into explainable, neutral summaries. It combines APR history, PIP history, compensation context, tenure, and contribution signals into a graph-backed workflow that supports review preparation, documentation quality, and transparency.
+This project transforms the earlier HR copilot MVP into an auditable retention workflow that:
+- accepts an employee id or selected mock employee profile,
+- routes the case through an orchestrator,
+- determines the employee role family,
+- invokes engineering or marketing evaluators,
+- normalizes outputs to a shared schema,
+- computes a derived retention score,
+- explains the result through an evidence → interpretation → conclusion chain,
+- produces console/json output plus PDF-ready and PPT-ready report sections.
 
-## Problem Statement
-HR and people managers often need to prepare for review conversations using incomplete or scattered records. Important context may live across APR notes, PIP history, compensation records, tenure data, and contribution signals. This project demonstrates how an agentic Jac system can:
-- consolidate these signals,
-- detect missing or inconsistent records,
-- generate explainable employee summaries,
-- surface trends and risk flags,
-- support review conversations,
-- improve documentation transparency.
+The system preserves decision-support guardrails: it is designed to support manager and HR review, not to automate employment decisions.
 
-## Why This Is Agentic AI
-This is more than a static chatbot. The system is agentic because it uses:
-- **Intent-based routing** — a query router walker interprets the user request and selects the right workflow.
-- **Multi-step reasoning flow** — each workflow decides which fetch and analysis actions to run.
-- **Tool/action usage** — helper actions fetch employee profile, APR, PIP, compensation, tenure, and contribution data.
-- **Graph-based workflow** — employee context is modeled as connected graph entities in Jac.
-- **Explainable outputs** — results include structured context, data gaps, and neutral summaries.
+## Architecture
 
-## Jac / Jaseci Architecture
-### Graph Entities / Nodes
-- `Employee`
-- `APRRecord`
-- `PIPRecord`
-- `CompensationRecord`
-- `ContributionRecord`
-- `SummaryRecord`
-- `DataGapRecord`
+### Backend services
+- `services/hr_service.sv.jac` — preserved existing HR copilot service endpoints.
+- `services/retention_service.sv.jac` — new retention orchestration service with realistic mock employee data and domain evaluators.
 
-### Walkers / Agents
-- `QueryRouterWalker` — chat-style entry walker that routes natural language queries.
-- `EmployeeSummaryWalker` — consolidates employee context and produces explainable summaries.
-- `TopContributorsWalker` — ranks contribution signals and summarizes top contributors.
-- `DataGapCheckWalker` — inspects missing or incomplete records.
-- `TeamReviewWalker` — prepares team-level review support summaries.
-- `RankingPreparationWalker` — creates neutral ranking-prep style context without employment recommendations.
+### Frontend
+- `hooks/useRetentionDashboard.cl.jac` — data hook that loads mock employees and runs evaluations.
+- `components/retentionDashboard.cl.jac` — dashboard UI for selection, execution, explainability, and report rendering.
+- `main.jac` — registers backend endpoints and mounts the retention dashboard.
+- `styles/global.css` — Tailwind-based styling and theme tokens.
 
-### Tool / Action Layer
-- `fetch_employee_profile`
-- `fetch_apr_history`
-- `fetch_pip_history`
-- `fetch_compensation`
-- `fetch_tenure`
-- `fetch_contributions`
-- `detect_data_gaps`
-- `prepare_employee_context`
-- `summarize_employee_context`
-- `summarize_team_context`
+## Retention workflow
+1. Select a mock employee.
+2. The orchestrator resolves the employee profile and role family.
+3. The system invokes:
+   - `engineering_evaluator` for engineering employees, or
+   - `marketing_evaluator` for marketing employees.
+4. Domain outputs are normalized into shared dimensions with:
+   - `name`
+   - `score`
+   - `weight`
+   - `weighted_score`
+   - `evidence`
+   - `interpretation`
+   - `conclusion`
+5. A derived retention score is computed with explainable adjustments.
+6. The final report is returned in:
+   - console summary,
+   - JSON report,
+   - PDF-ready sections,
+   - PPT-ready sections.
 
-## Supported Workflows
-### 1. Employee Summary
-Examples:
-- `Summarize Ava Patel`
-- `Explain Maya Singh's performance context`
-- `Show Liam Chen's profile`
+## Guardrails
+- Decision-support only.
+- Human review remains required.
+- Do not use the score as the sole basis for compensation, promotion, termination, or retention decisions.
+- Mock data is realistic but synthetic.
 
-Behavior:
-- fetch employee profile,
-- gather APR, PIP, compensation, tenure, and contribution data,
-- detect missing fields,
-- return structured summary + human-readable explanation.
-
-### 2. Top Contributors
-Examples:
-- `Show top contributors`
-- `Who contributed most recently?`
-- `Top 3 employees by contribution`
-
-Behavior:
-- inspect contribution records,
-- rank by available proxy contribution scores,
-- summarize top contributors,
-- clearly state this is not a termination or employment decision.
-
-### 3. Data Gap Check
-Examples:
-- `Which records are incomplete?`
-- `Show missing employee data`
-- `Check data consistency`
-
-Behavior:
-- inspect employees for missing APR, PIP, compensation, tenure, or contribution records,
-- create a gap report,
-- summarize incompleteness clearly.
-
-### 4. Team Review Summary
-Examples:
-- `Prepare a Platform team review summary`
-- `Show team overview`
-- `Give me a review prep summary`
-
-Behavior:
-- gather employee contexts for a team,
-- summarize patterns, trends, and missing records,
-- produce a human-readable team review brief.
-
-### 5. Performance Analysis
-Examples:
-- `Run employee performance analysis`
-- `Analyze employee context`
-
-Behavior:
-- orchestrate collection and consolidation of available signals,
-- produce explainable outputs,
-- avoid high-stakes recommendations.
-
-## Safety and Limitations
-### Safety
-This system is explicitly designed for:
-- employee context summaries,
-- data quality flags,
-- contribution overviews,
-- review support summaries.
-
-This system is **not** designed for:
-- firing recommendations,
-- retention recommendations,
-- termination decisions,
-- hiring/firing optimization logic.
-
-### Limitations
-- Data is mocked for demo purposes.
-- Contribution signals are simplified proxy metrics.
-- Outputs support human review and documentation, not automated employment decisions.
-
-## Project Structure
+## Project structure
 ```text
 .
 ├── jac.toml
 ├── main.jac
 ├── README.md
 ├── services/
-│   └── hr_service.sv.jac
+│   ├── hr_service.sv.jac
+│   └── retention_service.sv.jac
 ├── hooks/
-│   └── useHRCopilot.cl.jac
+│   ├── useHRCopilot.cl.jac
+│   └── useRetentionDashboard.cl.jac
 ├── components/
-│   └── hrCopilotApp.cl.jac
+│   ├── hrCopilotApp.cl.jac
+│   └── retentionDashboard.cl.jac
 └── styles/
     └── global.css
 ```
 
-## How to Run
+## Run
 ```bash
 jac install
 jac start --dev main.jac
 ```
-Then open the local app in the browser.
 
-## Example Queries
-- `Summarize Ava Patel`
-- `Show top contributors`
-- `Check missing employee records`
-- `Prepare a Platform team review summary`
-- `Run employee performance analysis`
-
-## Demo Notes
-The frontend provides a chat-style interface that sends natural language queries to the backend `chat_query` entrypoint. The backend loads a mock HR graph, routes the query through Jac walkers, executes the relevant tool-style actions, and returns structured, explainable results.
+## Demo behavior
+The dashboard renders a list of mock employees across engineering and marketing. Running an evaluation shows:
+- employee snapshot,
+- orchestrator routing details,
+- normalized dimensions,
+- evidence and interpretation chain,
+- final retention score and risk band,
+- JSON report,
+- PDF-ready sections,
+- PPT-ready sections.
